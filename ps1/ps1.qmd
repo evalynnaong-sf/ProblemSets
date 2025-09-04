@@ -1,0 +1,67 @@
+---
+title: "PS1"
+subtitle: "STAT 243"
+format: 
+    html: 
+        code-fold: true
+jupyter: python3
+---
+
+1. Memory (RAM) is volatile and cannot be used to store data permanently. However, it provides fast, random access to gigabyte (GB) size storage. In contrast, disks provide a more permanent storage solution with terabyte (TB) size storage. One drawback to relying on disks is that they are very slow compared to memory. (Storage estimates based on a computer architecture course I took previously). According to Google, even "medium data" scenarios (in the GB range) are often too large to work within a computer's RAM. Big data clusters (TB) will likely exceed even disk storage. That is where Cloud storage will likely come into play. 
+
+2. 
+a. 
+```{python}
+import numpy as np
+
+# to generate random numbers from a normal distr use np.random.normal
+# for standard normal the mean is 0 and std dev 1
+
+mu, sigma = 0, 1
+
+# np.random.normal(0, 1) by default generates 8 byte values
+# 16 MB / 8 bytes / 20 columns = 100000
+
+rows = 100000
+cols = 20
+
+x = np.random.normal(mu, sigma, size=(rows, cols))
+
+# Note: 16 MB is really 16 * 1024 * 1024 bytes, just used 16000000 for 16 MB to approximate 16 MB of data
+```
+
+b. 
+```{python}
+import os
+import pandas as pd
+x = x.round(decimals = 12)
+
+pd.DataFrame(x).to_csv('x.csv', header = False, index = False)
+print(f"{str(os.path.getsize('x.csv')/1e6)} MB")
+
+pd.DataFrame(x).to_pickle('x.pkl', compression = None) 
+print(f"{str(os.path.getsize('x.pkl')/1e6)} MB")
+
+```
+
+Numbers drawn from a standard normal distribution are 8 bytes. Rounded to 12 decimal points after results in 14-15 char per number (sign and ones place, not all are negative so not all have sign).
+There are also 100000 * 20 delimiter (comma and '\n')
+
+(14 char * 2000000 values in the array) + 2000000 delimiter = 30e+07 characters
+
+This aligns w the 30.77 MB size of the csv file. 
+
+Now if we rounded to four decimal places: 
+This cuts back significantly on expected char in the CSV
+
+(6 char * 2000000 values) + 2000000 delimiter = 1.2e+07 characters
+
+For pickle files, it will always store the full 8-byte floating-point representation. So rounding to 4 decimal places will not save disk space for the pickle file
+
+c. Because the newline ('\n') is still 1 char. 
+
+d. 
+```{python}
+
+
+
